@@ -25,6 +25,9 @@ module.exports = {
           r.identity,
         ]))(state);
     },
+    unselectGame: (state) => {
+      return r.assoc("game", null, state);
+    },
   },
   effects: {
     createGame: (state, data, send, done) => {

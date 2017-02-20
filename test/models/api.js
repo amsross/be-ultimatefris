@@ -43,6 +43,20 @@ test("models/api", assert => {
       assert.end();
     });
 
+    assert.test("unselectGame", assert => {
+      const actual = api.reducers.unselectGame({
+        "games": [{"id": 1}, {"id": 2}],
+      });
+      const expected = {
+        "game": null,
+        "games": [{"id": 1}, {"id": 2}],
+      }
+
+      assert.deepEqual(actual, expected, "should set the state's 'game' prop to null");
+
+      assert.end();
+    });
+
     assert.end();
   });
 
