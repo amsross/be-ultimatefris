@@ -1,0 +1,19 @@
+{
+  "name": "be-ultimatefris",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "engine": {
+    "node": ">=4.5"
+  },
+  "dependencies": {
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/tape test/**/*.js"
+  },
+  "author": "matt ross <amsross@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "tape": "^4.6.3"
+  }
+}
