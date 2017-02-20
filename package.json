@@ -7,15 +7,17 @@
     "node": ">=4.5"
   },
   "dependencies": {
+    "choo": "^4.1.0",
     "ramda": "^0.23.0",
     "uuid": "^3.0.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/tape test/**/*.js"
+    "test": "node_modules/.bin/browserify test/**/*.js | ./node_modules/.bin/tape-run | ./node_modules/.bin/tap-spec"
   },
   "author": "matt ross <amsross@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
     "sinon": "^1.17.7"
   }
