@@ -16,6 +16,7 @@
   "author": "matt ross <amsross@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "sinon": "^1.17.7"
   }
 }
