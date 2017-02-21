@@ -25,13 +25,7 @@ module.exports = {
         r.assoc("games", games))(state);
     },
     selectGame: (state, game) => {
-      return r.compose(
-        r.converge(r.assoc("game"), [
-          r.compose(
-            r.find(r.propEq("id", r.path(["id"], game))),
-            r.prop("games")),
-          r.identity,
-        ]))(state);
+      return r.assoc("game", game, state);
     },
     unselectGame: (state) => {
       return r.assoc("game", null, state);
