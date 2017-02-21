@@ -10,6 +10,22 @@ test("models/api", assert => {
 
     assert.ok(api.reducers, "property exists");
 
+    assert.test("updateCoords", assert => {
+
+      assert.deepEqual(api.reducers.updateCoords({
+        "foo": "bar",
+        "game": undefined,
+        "games": [],
+      }, [50, 70]), {
+        "foo": "bar",
+        "coords": [50, 70],
+        "game": undefined,
+        "games": []
+      }, "should update the `coords` on the state");
+
+      assert.end();
+    });
+
     assert.test("receiveGames", assert => {
 
       assert.deepEqual(api.reducers.receiveGames({
@@ -36,13 +52,14 @@ test("models/api", assert => {
     assert.test("selectGame", assert => {
       const actual = api.reducers.selectGame({
         "games": [{"id": 1}, {"id": 2}],
-      }, {"id": 2});
+      }, {"id": 2, "coords": [50, 70]});
       const expected = {
-        "game": {"id": 2},
+        "coords": [50, 70],
+        "game": {"id": 2, "coords": [50, 70]},
         "games": [{"id": 1}, {"id": 2}],
       }
 
-      assert.deepEqual(actual, expected, "should set the passed game on the state's 'game' prop");
+      assert.deepEqual(actual, expected, "should updated the coords and set the passed game on the state's 'game' prop");
 
       assert.end();
     });
