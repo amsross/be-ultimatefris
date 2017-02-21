@@ -54,7 +54,7 @@ test("views/game", assert => {
     "location": "HADDONFIELD, NJ",
   }, "correct values passed for updating");
 
-  const linkUnselect = form.querySelector("a");
+  const linkUnselect = form.querySelector("#game-unselectGame");
   linkUnselect.click();
   assert.equal(r.last(send.args)[0], "unselectGame", "unselectGame effect has been fired");
 

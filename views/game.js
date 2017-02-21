@@ -28,11 +28,14 @@ module.exports = function view(state, prev, send) {
 
             <label for="location" class="f6 b db mb2">Location</label>
             <input id="location" name="location" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${game.location||"Haddonfield, NJ"}">
-            <p>MAP</p>
+
+            <a href='https://maps.google.com/maps?z=16&daddr=${game.location}' id='game-directions'>
+              <img id='game-map' class='img-responsive game-map' src='http://maps.googleapis.com/maps/api/staticmap?center=${game.location}&zoom=16&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:G%7C${game.location}&sensor=false' />
+            </a>
 
             <div class="mt5">
               <input class="b dim ph3 pv2 input-reset ba b--green bg-transparent pointer f6" type="submit" value="Save">
-              <a class="b dim ph3 pv2 input-reset ba b--black bg-transparent pointer f6" onclick=${() => send("unselectGame")}>x</a>
+              <a id="game-unselectGame" class="b dim ph3 pv2 input-reset ba b--black bg-transparent pointer f6" onclick=${() => send("unselectGame")}>x</a>
             </div>
 
           </form>
