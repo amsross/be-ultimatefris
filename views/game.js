@@ -32,7 +32,7 @@ module.exports = function view(state, prev, send) {
 
             <div class="mt5">
               <input class="b dim ph3 pv2 input-reset ba b--green bg-transparent pointer f6" type="submit" value="Save">
-              <a class="b dim ph3 pv2 input-reset ba b--black bg-transparent pointer f6" onclick=${send.bind(null, "unselectGame")}>x</a>
+              <a class="b dim ph3 pv2 input-reset ba b--black bg-transparent pointer f6" onclick=${() => send("unselectGame")}>x</a>
             </div>
 
           </form>
