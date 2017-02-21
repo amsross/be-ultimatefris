@@ -9,17 +9,20 @@ test("views/game", assert => {
   const state = {
     "game": {
       "id": 1,
+      "coords": [0, 0],
       "name": "game 1",
       "date": new Date().toISOString(),
       "location": "Haddonfield, NJ",
     },
     "games": [{
       "id": 1,
+      "coords": [0, 0],
       "name": "game 1",
       "date": new Date().toISOString(),
       "location": "Haddonfield, NJ",
     }, {
       "id": 2,
+      "coords": [0, 0],
       "name": "game 2",
       "date": new Date().toISOString(),
       "location": "Haddonfield, NJ",
@@ -30,7 +33,7 @@ test("views/game", assert => {
 
   const element = game(state, prev, send);
 
-  assert.equal(element.tagName, "DIV", "returns a container element");
+  assert.equal(element.tagName, "ARTICLE", "returns a container element");
 
   const form = element.querySelector("article form");
 
@@ -40,15 +43,14 @@ test("views/game", assert => {
   assert.equal(form.querySelector("input[name='location']").value, "Haddonfield, NJ", "game has correct location");
 
   const inputSubmit = form.querySelector("input[type='submit']");
-  inputSubmit.click();
-  assert.equal(r.last(send.args)[0], "updateGame", "updateGame effect has been fired");
-
   form.querySelector("input[name='name']").value = "GAME 1";
   form.querySelector("input[name='date']").value = "2017-01-20T10:37";
   form.querySelector("input[name='location']").value = "HADDONFIELD, NJ";
   inputSubmit.click();
+  assert.equal(r.last(send.args)[0], "updateGame", "updateGame effect has been fired");
   assert.deepEqual(r.last(send.args)[1], {
     "id": "1",
+    "coords": ["0", "0"],
     "name": "GAME 1",
     "date": "2017-01-20T10:37",
     "location": "HADDONFIELD, NJ",
@@ -57,6 +59,10 @@ test("views/game", assert => {
   const linkUnselect = form.querySelector("#game-unselectGame");
   linkUnselect.click();
   assert.equal(r.last(send.args)[0], "unselectGame", "unselectGame effect has been fired");
+
+  const linkDelete = form.querySelector("#game-deleteGame");
+  linkDelete.click();
+  assert.equal(r.last(send.args)[0], "deleteGame", "deleteGame effect has been fired");
 
   clock.restore();
   assert.end();

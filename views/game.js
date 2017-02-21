@@ -1,9 +1,6 @@
-const $ = require("jquery");
 const r = require("ramda");
-const h = require("highland");
 const html = require("choo/html");
 const moment = require("moment-timezone");
-const geocoder = require("geocoder-geojson")
 const serialize = require("form-serialize");
 
 module.exports = function view(state, prev, send) {
@@ -17,28 +14,6 @@ module.exports = function view(state, prev, send) {
     e.preventDefault();
   }
 
-  function onload(elem) {
-    const form = elem.querySelector("form");
-    const inputLocation = $(form.querySelector("#location"));
-    const inputLocationKeyup = h("keyup", inputLocation)
-    const inputLocationChange = h("change", inputLocation)
-
-    h([inputLocationKeyup, inputLocationChange])
-      .merge()
-      .debounce(750)
-      .map(evt => evt.currentTarget.value)
-      .flatMap(address => h(geocoder.google(address, {short: true})))
-      .map(r.compose(
-        r.reverse,
-        r.unnest, r.of,
-        r.path(["geometry", "coordinates"]),
-        r.head,
-        r.prop("features")))
-      .each(coords => {
-        send("selectGame", r.assoc("coords", coords, serialize(form, { hash: true })));
-      });
-  }
-
   function onDelete(e) {
     send("deleteGame", game);
     e.preventDefault();
@@ -50,7 +25,7 @@ module.exports = function view(state, prev, send) {
   }
 
   return html`
-      <article class="game w-100 bg-light-gray" onload=${onload}>
+      <article class="game w-100 bg-light-gray">
         <form class="pa4 black-80" onsubmit=${onSubmit}>
 
           <input id="id" name="id" type="hidden" value="${game.id}" >

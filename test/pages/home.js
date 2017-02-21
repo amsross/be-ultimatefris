@@ -41,7 +41,7 @@ test("pages/home", assert => {
     // assert.ok(send.called, "send triggered");
     // assert.equal(r.last(send.args)[0], "createGame", "createGame effect has been fired");
 
-    assert.equal(element.querySelector("section").children.length, 2, "both games-list and game views are present");
+    assert.equal(element.querySelector("section section:nth-child(2)").children.length, 2, "both games-list and game views are present");
     // element.querySelector("section a").click();
     // assert.ok(send.called, "send triggered");
     // assert.equal(r.last(send.args)[0], "selectGame", "selectGame effect has been fired");
@@ -63,7 +63,7 @@ test("pages/home", assert => {
     // assert.ok(send.called, "send triggered");
     // assert.equal(r.last(send.args)[0], "createGame", "createGame effect has been fired");
 
-    assert.equal(element.querySelector("section").children.length, 1, "only games-list view are present");
+    assert.equal(element.querySelector("section section:nth-child(2)").children.length, 1, "only games-list view are present");
     // element.querySelector("section a").click();
     // assert.ok(send.called, "send triggered");
     // assert.equal(r.last(send.args)[0], "selectGame", "selectGame effect has been fired");

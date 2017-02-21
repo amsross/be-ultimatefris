@@ -18,7 +18,7 @@ module.exports = function view(state, prev, send) {
     `;
 
   return html`
-      <div class="flex-auto">
+      <div class="games">
         ${state.games.map(mapper)}
       </div>
     `;
