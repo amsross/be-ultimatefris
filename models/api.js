@@ -14,13 +14,21 @@ module.exports = {
   },
   reducers: {
     receiveGames: (state, games) => {
-      return r.assoc("games", games, state);
+      return r.compose(
+        r.when(r.compose(r.not, r.isNil, r.path(["game", "id"])),
+          r.converge(r.assoc("game"), [
+            r.compose(
+              r.find(r.propEq("id", r.path(["game", "id"], state))),
+              r.prop("games")),
+            r.identity,
+          ])),
+        r.assoc("games", games))(state);
     },
     selectGame: (state, game) => {
       return r.compose(
         r.converge(r.assoc("game"), [
           r.compose(
-            r.either(r.find(r.propEq("id", game.id)), r.always(game)),
+            r.find(r.propEq("id", r.path(["id"], game))),
             r.prop("games")),
           r.identity,
         ]))(state);
@@ -36,11 +44,11 @@ module.exports = {
     readGames: (state, data, send, done) => {
       store.read("games", games => send("receiveGames", games, done));
     },
-    updateGame: (state, data, send, done) => {
-      store.update("games", data, game => send("receiveGames", game, done));
+    updateGame: (state, game, send, done) => {
+      store.update("games", game, games => send("receiveGames", games, done));
     },
-    deleteGame: (state, data, send, done) => {
-      store.delete("games", data, game => send("receiveGames", game, done));
+    deleteGame: (state, game, send, done) => {
+      store.delete("games", game, game => send("receiveGames", game, done));
     },
   },
 };

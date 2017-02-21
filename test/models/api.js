@@ -11,20 +11,24 @@ test("models/api", assert => {
     assert.ok(api.reducers, "property exists");
 
     assert.test("receiveGames", assert => {
-      const actual = api.reducers.receiveGames({
-        "foo": "bar",
-        "games": [],
-      }, [{
-        "bar": "foo"
-      }]);
-      const expected = {
-        "foo": "bar",
-        "games": [{
-          "bar": "foo"
-        }]
-      };
 
-      assert.deepEqual(actual, expected, "should update 'games' prop without mutating other props");
+      assert.deepEqual(api.reducers.receiveGames({
+        "foo": "bar",
+        "game": undefined,
+        "games": [],
+      }, [{"id": 1, "bar": "foo"}]), {
+        "foo": "bar",
+        "game": undefined,
+        "games": [{"id": 1, "bar": "foo"}]
+      }, "should update 'games' prop without mutating other props");
+
+      assert.deepEqual(api.reducers.receiveGames({
+        "game": {"id": 1, "foo": "bar"},
+        "games": [{"id": 1, "foo": "bar"}],
+      }, [{"id": 1, "foo": "foo"}]), {
+        "game": {"id": 1, "foo": "foo"},
+        "games": [{"id": 1, "foo": "foo"}],
+      }, "should update 'game' prop with the new version in the 'games' array");
 
       assert.end();
     });
