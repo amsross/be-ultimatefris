@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "choo": "^4.1.0",
+    "form-serialize": "^0.7.1",
+    "moment-timezone": "^0.5.11",
     "ramda": "^0.23.0",
     "uuid": "^3.0.1"
   },
@@ -17,8 +19,9 @@
   "author": "matt ross <amsross@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "sinon": "^1.17.7",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
-    "sinon": "^1.17.7"
+    "tape-run": "^2.2.1"
   }
 }

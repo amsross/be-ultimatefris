@@ -41,4 +41,3 @@ test("views/gamesList", assert => {
 
   assert.end();
 });
-
