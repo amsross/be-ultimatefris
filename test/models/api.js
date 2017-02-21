@@ -6,7 +6,7 @@ test("models/api", assert => {
 
   assert.ok(api.state, "property exists");
 
-  test("reducers", assert => {
+  assert.test("reducers", assert => {
 
     assert.ok(api.reducers, "property exists");
 
@@ -64,7 +64,7 @@ test("models/api", assert => {
     assert.end();
   });
 
-  test("effects", assert => {
+  assert.test("effects", assert => {
 
     assert.ok(api.effects, "property exists");
 
