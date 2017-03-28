@@ -1,13 +1,12 @@
-"use strict";
-const html = require("choo/html");
-const Map = require("../lib/map");
-const mapWidget = Map();
+'use strict'
+const html = require('choo/html')
+const Map = require('../lib/map')
+const mapWidget = Map()
 
-module.exports = function view(state, prev, send) {
-
+module.exports = function view (state, emit) {
   return html`
       <div>
-        ${mapWidget(state, prev, send)}
+        ${mapWidget(state, emit)}
       </div>
-    `;
-};
+    `
+}

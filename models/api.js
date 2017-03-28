@@ -1,61 +1,98 @@
-const r = require("ramda");
-const uuid = require("uuid/v4");
-const storage = require("../lib/storage");
+const r = require('ramda')
+const tap = require('../lib/pull-tap')
+const pull = require('pull-stream')
+const Push = require('pull-pushable')
+const storage = require('../lib/storage')
 const store = r.tryCatch(
   x => x(window.localStorage),
   e => storage({
-    "games": [],
-  }))(storage);
+    'games': []
+  }))(storage)
 
-module.exports = {
-  state: {
-    "coords": [],
-    "games": [],
-    "game": null,
+const setupListener = through => {
+  const push = Push()
+  pull(
+    push,
+    tap(x => { if (x === 'push:nil') push.close() }),
+    through,
+    pull.drain(() => {}))
+  return push.push
+}
+
+const reducers = {
+  selectGame: (state, emit) => {
+    return setupListener(pull(
+      tap(game => {
+        state.game = game
+        state.coords = r.compose(
+          r.map(Number),
+          r.reject(r.isNil),
+          r.unnest,
+          r.of)(r.prop('coords', game))
+      }),
+      tap(() => emit.emit('render'))))
   },
-  reducers: {
-    updateCoords: (state, coords) => {
-      return r.assoc("coords", r.map(Number, coords), state);
-    },
-    receiveGames: (state, games) => {
-      return r.compose(
-        r.when(r.compose(r.not, r.isNil, r.path(["game", "id"])),
-          r.converge(r.assoc("game"), [
+  unselectGame: (state, emit) => {
+    return setupListener(pull(
+      tap(() => { state.game = null }),
+      tap(() => emit.emit('render'))))
+  },
+  updateCoords: (state, emit) => {
+    return setupListener(pull(
+      tap(coords => { state.coords = r.map(Number, coords) }),
+      tap(() => emit.emit('render'))))
+  },
+  receiveGames: (state, emit) => {
+    return setupListener(pull(
+      tap(games => {
+        state.games = games
+        if (r.path(['game', 'id'], state)) {
+          state.game = r.converge((x, y) => x(y), [
             r.compose(
-              r.find(r.propEq("id", r.path(["game", "id"], state))),
-              r.prop("games")),
-            r.identity,
-          ])),
-        r.assoc("games", games))(state);
-    },
-    selectGame: (state, game) => {
+              r.find,
+              r.propEq('id'),
+              r.path(['game', 'id'])),
+            r.prop('games')
+          ])(state)
+        }
+      }),
+      tap(() => emit.emit('render'))))
+  }
+}
 
-      const coords = r.compose(
-        r.map(Number),
-        r.reject(r.isNil),
-        r.unnest,
-        r.of)(r.prop("coords", game));
+const effects = {
+  createGame: (state, emit) => {
+    return setupListener(pull(
+      pull.asyncMap((data, cb) => store.create('games', game => cb(null, game))),
+      tap(game => emit.emit('selectGame', game))))
+  },
+  readGames: (state, emit) => {
+    return setupListener(pull(
+      pull.asyncMap((data, cb) => store.read('games', games => cb(null, games))),
+      tap(games => emit.emit('receiveGames', games))))
+  },
+  updateGame: (state, emit) => {
+    return setupListener(pull(
+      pull.asyncMap((game, cb) => store.update('games', game, games => cb(null, games))),
+      tap(games => emit.emit('receiveGames', games))))
+  },
+  deleteGame: (state, emit) => {
+    return setupListener(pull(
+      pull.asyncMap((game, cb) => store.delete('games', game, games => cb(null, games))),
+      tap(games => emit.emit('receiveGames', games))))
+  }
+}
 
-      return r.compose(
-        r.assoc("coords", coords),
-        r.assoc("game", game))(state);
-    },
-    unselectGame: (state) => {
-      return r.assoc("game", null, state);
-    },
-  },
-  effects: {
-    createGame: (state, data, send, done) => {
-      store.create("games", game => send("selectGame", game, done));
-    },
-    readGames: (state, data, send, done) => {
-      store.read("games", games => send("receiveGames", games, done));
-    },
-    updateGame: (state, game, send, done) => {
-      store.update("games", game, games => send("receiveGames", games, done));
-    },
-    deleteGame: (state, game, send, done) => {
-      store.delete("games", game, game => send("receiveGames", game, done));
-    },
-  },
-};
+module.exports = (state, emitter) => {
+  state.coords = state.coords || [0, 0]
+  state.games = state.games || []
+  state.game = state.game || null
+
+  r.mapObjIndexed((reducer, event) => {
+    emitter.on(event, reducer(state, emitter))
+  }, reducers)
+
+  r.mapObjIndexed((effect, event) => {
+    emitter.on(event, effect(state, emitter))
+  }, effects)
+}

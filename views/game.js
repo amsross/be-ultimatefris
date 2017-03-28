@@ -1,27 +1,26 @@
-const r = require("ramda");
-const html = require("choo/html");
-const moment = require("moment-timezone");
-const serialize = require("form-serialize");
+const r = require('ramda')
+const html = require('choo/html')
+const moment = require('moment-timezone')
+const serialize = require('form-serialize')
 
-module.exports = function view(state, prev, send) {
+module.exports = function view (state, emit) {
+  if (state.game === null || state.game === undefined) return
 
-  if (state.game === null || state.game === undefined) return;
-
-  const game = r.over(r.lensProp("coords"), r.compose(r.unnest, r.of), state.game);
+  const game = r.over(r.lensProp('coords'), r.compose(r.unnest, r.of), state.game)
 
   function onSubmit (e) {
-    send("updateGame", serialize(e.target, { hash: true }));
-    e.preventDefault();
+    emit('updateGame', serialize(e.target, { hash: true }))
+    e.preventDefault()
   }
 
   function onDelete(e) {
-    send("deleteGame", game);
-    e.preventDefault();
+    emit('deleteGame', r.pick(['id'], game))
+    e.preventDefault()
   }
 
-  function onUnselect(e) {
-    send("unselectGame");
-    e.preventDefault();
+  function onUnselect (e) {
+    emit('unselectGame')
+    e.preventDefault()
   }
 
   return html`
@@ -30,13 +29,13 @@ module.exports = function view(state, prev, send) {
 
           <input id="id" name="id" type="hidden" value="${game.id}" >
           <label for="name" class="f6 b db mb2">Name</label>
-          <input id="name" name="name" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${game.name||"New Game"}">
+          <input id="name" name="name" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${game.name || 'New Game'}">
 
           <label for="date" class="f6 b db mb2">Date</label>
-          <input id="date" name="date" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${moment(game.date).format("YYYY-MM-DDTHH:mm")}">
+          <input id="date" name="date" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${moment(game.date).format('YYYY-MM-DDTHH:mm')}">
 
           <label for="location" class="f6 b db mb2">Location</label>
-          <input id="location" name="location" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${game.location||"Haddonfield, NJ"}">
+          <input id="location" name="location" class="input-reset ba b--black-20 pa2 mb2 db w-100" type="text" value="${game.location || 'Haddonfield, NJ'}">
           <input id="coords[0]" name="coords[0]" type="hidden" value="${r.init(game.coords)}">
           <input id="coords[1]" name="coords[1]" type="hidden" value="${r.last(game.coords)}">
 
@@ -48,5 +47,5 @@ module.exports = function view(state, prev, send) {
 
         </form>
       </article>
-    `;
-};
+    `
+}

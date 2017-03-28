@@ -1,7 +1,6 @@
-const html = require("choo/html");
+const html = require('choo/html')
 
-module.exports = function view(state, prev, send) {
-
+module.exports = function view (state, emit) {
   const mapper = item => html`
       <article class="dt w-100 bb b--black-05 pb2 mt2">
         <div class="dtc w2 w3-ns v-mid">
@@ -12,15 +11,14 @@ module.exports = function view(state, prev, send) {
           <h2 class="f6 fw4 mt0 mb0 black-60">${item.location}</h2>
         </div>
         <div class="dtc v-mid tr">
-          <a class="f6 link dim br3 ph3 pv2 mb2 dib ba bw1 dark-green" onclick=${() => send("selectGame", item)}>View</a>
+          <a class="f6 link dim br3 ph3 pv2 mb2 dib ba bw1 dark-green" onclick=${() => emit('selectGame', item)}>View</a>
         </div>
       </article>
-    `;
+    `
 
   return html`
       <div class="games">
         ${state.games.map(mapper)}
       </div>
-    `;
-};
-
+    `
+}
