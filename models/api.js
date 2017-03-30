@@ -1,6 +1,7 @@
 const r = require('ramda')
 const tap = require('../lib/pull-tap')
 const pull = require('pull-stream')
+const debounce = require('pull-debounce')
 const Push = require('pull-pushable')
 const storage = require('../lib/storage')
 const store = r.tryCatch(
@@ -9,28 +10,19 @@ const store = r.tryCatch(
     'games': []
   }))(storage)
 
-const setupListener = through => {
-  const push = Push()
-  pull(
-    push,
-    tap(x => { if (x === 'push:nil') push.close() }),
-    through,
-    pull.drain(() => {}))
-  return push.push
-}
-
 const reducers = {
   selectGame: (state, emit) => {
     return setupListener(pull(
-      tap(game => {
+      pull.map(game => {
         state.game = game
         state.coords = r.compose(
           r.map(Number),
           r.reject(r.isNil),
           r.unnest,
           r.of)(r.prop('coords', game))
+        return state;
       }),
-      tap(() => emit.emit('render'))))
+      tap(state => emit.emit('updateCoords', state.coords))))
   },
   unselectGame: (state, emit) => {
     return setupListener(pull(
@@ -39,15 +31,19 @@ const reducers = {
   },
   updateCoords: (state, emit) => {
     return setupListener(pull(
-      tap(coords => { state.coords = r.map(Number, coords) }),
-      tap(() => emit.emit('render'))))
+      tap(coords => {
+        if (r.equals(state.coords, coords)) {
+          state.coords = r.map(Number, coords)
+          emit.emit('readGames')
+        } else emit.emit('render')
+      })))
   },
   receiveGames: (state, emit) => {
     return setupListener(pull(
       tap(games => {
         state.games = games
         if (r.path(['game', 'id'], state)) {
-          state.game = r.converge((x, y) => x(y), [
+          state.game = r.converge(r.call, [
             r.compose(
               r.find,
               r.propEq('id'),
@@ -61,6 +57,11 @@ const reducers = {
 }
 
 const effects = {
+  moveMap: (state, emit) => {
+    return setupListener(pull(
+      debounce(250),
+      tap(coords => emit.emit('updateCoords', coords))))
+  },
   createGame: (state, emit) => {
     return setupListener(pull(
       pull.asyncMap((data, cb) => store.create('games', game => cb(null, game))),
@@ -81,6 +82,16 @@ const effects = {
       pull.asyncMap((game, cb) => store.delete('games', game, games => cb(null, games))),
       tap(games => emit.emit('receiveGames', games))))
   }
+}
+
+function setupListener (through) {
+  const push = Push()
+  pull(
+    push,
+    tap(x => { if (x === 'push:nil') push.close() }),
+    through,
+    pull.drain(() => {}))
+  return push.push
 }
 
 module.exports = (state, emitter) => {

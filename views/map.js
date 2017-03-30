@@ -4,9 +4,5 @@ const Map = require('../lib/map')
 const mapWidget = Map()
 
 module.exports = function view (state, emit) {
-  return html`
-      <div>
-        ${mapWidget(state, emit)}
-      </div>
-    `
+  return mapWidget(state.coords)
 }
