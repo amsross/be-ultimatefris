@@ -21,7 +21,7 @@ const reducers = {
           r.reject(r.isNil),
           r.unnest,
           r.of)(r.prop('coords', game))
-        return state;
+        return state
       }),
       tap(state => emit.emit('updateCoords', state.coords))))
   },
