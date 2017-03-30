@@ -4,11 +4,12 @@
   "description": "",
   "main": "client.js",
   "engine": {
-    "node": ">=4.5"
+    "node": ">=6.4"
   },
   "dependencies": {
     "cache-element": "^2.0.1",
     "choo": "^5.0.0",
+    "crocks": "^0.4.1",
     "form-serialize": "^0.7.1",
     "leaflet": "^1.0.3",
     "moment-timezone": "^0.5.11",

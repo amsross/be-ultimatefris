@@ -1,4 +1,5 @@
 const r = require('ramda')
+const { either, safe } = require('crocks')
 const tap = require('../lib/pull-tap')
 const pull = require('pull-stream')
 const debounce = require('pull-debounce')
@@ -31,12 +32,13 @@ const reducers = {
   },
   updateCoords: (state, emit) => {
     return setupListener(pull(
-      tap(coords => {
-        if (r.equals(state.coords, coords)) {
-          state.coords = r.map(Number, coords)
-          emit.emit('readGames')
-        } else emit.emit('render')
-      })))
+      tap(coords => r.compose(
+        either(() => emit.emit('render'),
+          coords => {
+            state.coords = coords
+            emit.emit('readGames')
+          }),
+        safe(r.equals(state.coords)))(coords))))
   },
   receiveGames: (state, emit) => {
     return setupListener(pull(
