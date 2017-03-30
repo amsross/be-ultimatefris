@@ -4,7 +4,7 @@
   "description": "",
   "main": "client.js",
   "engine": {
-    "node": ">=6.4"
+    "node": ">=4.5"
   },
   "dependencies": {
     "cache-element": "^2.0.1",
