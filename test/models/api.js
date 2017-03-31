@@ -2,16 +2,15 @@ const sinon = require('sinon')
 const test = require('tape')
 
 test('models/api', assert => {
+  const listeners = {}
+  const emitter = {
+    'on': sinon.spy((event, reducer) => {
+      listeners[event] = reducer
+    }),
+    'emit': sinon.spy((event, data) => {})
+  }
 
   assert.test('reducers', assert => {
-    const reducers = {}
-    const emitter = {
-      'on': sinon.spy((event, reducer) => {
-        reducers[event] = reducer
-      }),
-      'emit': sinon.spy((event, data) => {})
-    }
-
     assert.test('selectGame', assert => {
       const state = {
         'games': [{'id': 1}, {'id': 2}]
@@ -19,7 +18,7 @@ test('models/api', assert => {
       const api = require('../../models/api')(state, emitter)
       emitter.on.reset()
 
-      reducers.selectGame({'id': 2, 'coords': [50, 70]})
+      listeners.selectGame({'id': 2, 'coords': [50, 70]})
 
       assert.equal(emitter.emit.callCount, 2, 'correct number of emitted events')
       assert.ok(emitter.emit.calledWith('updateCoords', [50, 70]), 'coords were set to those of supplied game')
@@ -40,7 +39,7 @@ test('models/api', assert => {
       const api = require('../../models/api')(state, emitter)
       emitter.on.reset()
 
-      reducers.unselectGame()
+      listeners.unselectGame()
 
       assert.equal(emitter.emit.callCount, 1, 'correct number of emitted events')
       assert.ok(emitter.emit.calledWith('render'), 'rendered after updates')
@@ -60,7 +59,7 @@ test('models/api', assert => {
       const api = require('../../models/api')(state, emitter)
       emitter.on.reset()
 
-      reducers.updateCoords([50, 70])
+      listeners.updateCoords([50, 70])
 
       assert.equal(emitter.emit.callCount, 0, 'correct number of emitted events')
 
@@ -79,7 +78,7 @@ test('models/api', assert => {
       const api = require('../../models/api')(state, emitter)
       emitter.on.reset()
 
-      reducers.receiveGames([{'id': 1, 'bar': 'foo'}])
+      listeners.receiveGames([{'id': 1, 'bar': 'foo'}])
 
       assert.equal(emitter.emit.callCount, 1, 'correct number of emitted events')
       assert.ok(emitter.emit.calledWith('render'), 'rendered after updates')
@@ -97,6 +96,68 @@ test('models/api', assert => {
 
       assert.end()
     })
+
+    assert.end()
+  })
+
+  assert.test('effects', assert => {
+    assert.test('updateLocation', assert => {
+      const state = {
+        'game': {'id': 1, 'location': 'foo', 'coords': [0, 0]},
+      }
+      const api = require('../../models/api')(state, emitter)
+      emitter.on.reset()
+
+      listeners.updateLocation('1600 Pennsylvania Ave NW, Washington, DC 20006')
+
+      setTimeout(() => {
+        assert.equal(emitter.emit.callCount, 1, 'correct number of emitted events')
+        assert.ok(emitter.emit.calledWith('selectGame'), 'select the game ')
+
+        assert.deepEqual(state.game.coords,
+          [ 38.8987586, -77.0376581 ],
+          'should set game\'s \'coords\' prop to the returned value')
+
+        assert.deepEqual(state.game.location,
+          '1600 Pennsylvania Ave NW, Washington, DC 20006',
+          'should set game\'s \'location\' prop to the passed value')
+
+        emitter.on.reset()
+        emitter.emit.reset()
+
+        assert.end()
+      }, 1000)
+    })
+
+    assert.test('moveMap', assert => {
+      const state = {}
+      const api = require('../../models/api')(state, emitter)
+      emitter.on.reset()
+
+      listeners.moveMap([50, 70])
+
+      setTimeout(() => {
+        assert.equal(emitter.emit.callCount, 2, 'correct number of emitted events')
+        assert.ok(emitter.emit.calledWith('updateCoords', [50, 70]), 'properly set coords')
+        assert.ok(emitter.emit.calledWith('readGames'), 'query for games within map bounds')
+
+        emitter.on.reset()
+        emitter.emit.reset()
+
+        state.coords = [50, 70];
+        listeners.moveMap([50, 70])
+
+        setTimeout(() => {
+          assert.equal(emitter.emit.callCount, 0, 'correct number of emitted events')
+
+          emitter.on.reset()
+          emitter.emit.reset()
+
+          assert.end()
+        }, 350)
+      }, 350)
+    })
+
 
     assert.end()
   })
