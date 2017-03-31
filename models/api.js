@@ -16,7 +16,7 @@ const reducers = {
   selectGame: (state, emit) => {
     return setupListener(pull(
       pull.map(game => {
-        state.game = state.game || game
+        state.game = game
         state.coords = r.ifElse(r.equals(state.coords),
           r.always(state.coords),
           r.compose(
