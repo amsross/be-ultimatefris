@@ -1,8 +1,9 @@
 const r = require('ramda')
-const { either, safe } = require('crocks')
+const { safeLift } = require('crocks')
 const tap = require('../lib/pull-tap')
 const pull = require('pull-stream')
 const debounce = require('pull-debounce')
+const geocoder = require('geocoder-geojson')
 const Push = require('pull-pushable')
 const storage = require('../lib/storage')
 const store = r.tryCatch(
@@ -15,15 +16,17 @@ const reducers = {
   selectGame: (state, emit) => {
     return setupListener(pull(
       pull.map(game => {
-        state.game = game
-        state.coords = r.compose(
-          r.map(Number),
-          r.reject(r.isNil),
-          r.unnest,
-          r.of)(r.prop('coords', game))
+        state.game = state.game || game
+        state.coords = r.ifElse(r.equals(state.coords),
+          r.always(state.coords),
+          r.compose(
+            r.map(Number),
+            r.reject(r.isNil),
+            r.unnest, r.of))(r.prop('coords', game))
         return state
       }),
-      tap(state => emit.emit('updateCoords', state.coords))))
+      tap(state => emit.emit('updateCoords', state.coords)),
+      tap(() => emit.emit('render'))))
   },
   unselectGame: (state, emit) => {
     return setupListener(pull(
@@ -32,13 +35,12 @@ const reducers = {
   },
   updateCoords: (state, emit) => {
     return setupListener(pull(
-      tap(coords => r.compose(
-        either(() => emit.emit('render'),
+      tap(coords => safeLift(r.none(r.isNil), r.compose(
+        r.unless(r.equals(state.coords),
           coords => {
             state.coords = coords
-            emit.emit('readGames')
           }),
-        safe(r.equals(state.coords)))(coords))))
+        r.map(Number)))(coords))))
   },
   receiveGames: (state, emit) => {
     return setupListener(pull(
@@ -59,10 +61,34 @@ const reducers = {
 }
 
 const effects = {
+  updateLocation: (state, emit) => {
+    return setupListener(pull(
+      debounce(740),
+      tap(location => {
+        state.game = r.set(r.lensProp('location'), location, state.game)
+      }),
+      pull.asyncMap((location, cb) => geocoder.google(location, {short: true})
+        .then(points => cb(null, points))),
+      pull.map(r.compose(
+        r.reverse,
+        r.unnest, r.of,
+        r.path(['geometry', 'coordinates']),
+        r.head,
+        r.prop('features'))),
+      tap(coords => {
+        state.game = r.set(r.lensProp('coords'), coords, state.game)
+      }),
+      tap(coords => emit.emit('selectGame', state.game))))
+  },
   moveMap: (state, emit) => {
     return setupListener(pull(
       debounce(250),
-      tap(coords => emit.emit('updateCoords', coords))))
+      tap(coords => r.unless(r.equals(state.coords),
+        coords => {
+          emit.emit('updateCoords', coords)
+          emit.emit('readGames')
+        })(coords))
+    ))
   },
   createGame: (state, emit) => {
     return setupListener(pull(

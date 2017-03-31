@@ -11,6 +11,8 @@
     "choo": "^5.0.0",
     "crocks": "^0.4.1",
     "form-serialize": "^0.7.1",
+    "geocoder-geojson": "^1.10.6",
+    "jquery": "^3.1.1",
     "leaflet": "^1.0.3",
     "moment-timezone": "^0.5.11",
     "pull-debounce": "^1.1.1",

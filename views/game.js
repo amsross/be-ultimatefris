@@ -1,3 +1,4 @@
+const $ = require('jquery')
 const r = require('ramda')
 const html = require('choo/html')
 const moment = require('moment-timezone')
@@ -13,7 +14,18 @@ module.exports = function view (state, emit) {
     e.preventDefault()
   }
 
-  function onDelete(e) {
+  function onload (elem) {
+    const form = elem.querySelector('form')
+    const inputLocation = $(form.querySelector('#location'))
+
+    const inputChange = r.compose(
+      location => emit('updateLocation', location),
+      r.path(['currentTarget', 'value']))
+
+    inputLocation.on('keyup', inputChange)
+  }
+
+  function onDelete (e) {
     emit('deleteGame', r.pick(['id'], game))
     e.preventDefault()
   }
@@ -24,7 +36,7 @@ module.exports = function view (state, emit) {
   }
 
   return html`
-      <article class="game w-100 bg-light-gray">
+      <article class="game w-100 bg-light-gray" onload=${onload}>
         <form class="pa4 black-80" onsubmit=${onSubmit}>
 
           <input id="id" name="id" type="hidden" value="${game.id}" >
