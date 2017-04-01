@@ -1,5 +1,6 @@
 const sinon = require('sinon')
 const test = require('tape')
+const api = require('../../models/api')
 
 test('models/api', assert => {
   const listeners = {}
@@ -15,7 +16,7 @@ test('models/api', assert => {
       const state = {
         'games': [{'id': 1}, {'id': 2}]
       }
-      const api = require('../../models/api')(state, emitter)
+      api(state, emitter)
       emitter.on.reset()
 
       listeners.selectGame({'id': 2, 'coords': [50, 70]})
@@ -36,7 +37,7 @@ test('models/api', assert => {
         'games': [{'id': 1}, {'id': 2}],
         'game': {'id': 1}
       }
-      const api = require('../../models/api')(state, emitter)
+      api(state, emitter)
       emitter.on.reset()
 
       listeners.unselectGame()
@@ -56,7 +57,7 @@ test('models/api', assert => {
         'games': [{'id': 1}, {'id': 2}],
         'game': {'id': 1}
       }
-      const api = require('../../models/api')(state, emitter)
+      api(state, emitter)
       emitter.on.reset()
 
       listeners.updateCoords([50, 70])
@@ -73,9 +74,9 @@ test('models/api', assert => {
     assert.test('receiveGames', assert => {
       const state = {
         'game': {'id': 1, 'bar': 'baz'},
-        'games': [],
+        'games': []
       }
-      const api = require('../../models/api')(state, emitter)
+      api(state, emitter)
       emitter.on.reset()
 
       listeners.receiveGames([{'id': 1, 'bar': 'foo'}])
@@ -103,9 +104,9 @@ test('models/api', assert => {
   assert.test('effects', assert => {
     assert.test('updateLocation', assert => {
       const state = {
-        'game': {'id': 1, 'location': 'foo', 'coords': [0, 0]},
+        'game': {'id': 1, 'location': 'foo', 'coords': [0, 0]}
       }
-      const api = require('../../models/api')(state, emitter)
+      api(state, emitter)
       emitter.on.reset()
 
       listeners.updateLocation('1600 Pennsylvania Ave NW, Washington, DC 20006')
@@ -131,7 +132,7 @@ test('models/api', assert => {
 
     assert.test('moveMap', assert => {
       const state = {}
-      const api = require('../../models/api')(state, emitter)
+      api(state, emitter)
       emitter.on.reset()
 
       listeners.moveMap([50, 70])
@@ -144,7 +145,7 @@ test('models/api', assert => {
         emitter.on.reset()
         emitter.emit.reset()
 
-        state.coords = [50, 70];
+        state.coords = [50, 70]
         listeners.moveMap([50, 70])
 
         setTimeout(() => {
@@ -157,7 +158,6 @@ test('models/api', assert => {
         }, 350)
       }, 350)
     })
-
 
     assert.end()
   })
