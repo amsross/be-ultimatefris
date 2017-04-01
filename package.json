@@ -24,7 +24,7 @@
   "scripts": {
     "test": "npm run test:lint && npm run test:tape",
     "test:lint": "node_modules/.bin/standard",
-    "test:tape": "node_modules/.bin/browserify test/**/*.js | ./node_modules/.bin/tape-run | ./node_modules/.bin/tap-spec"
+    "test:tape": "node test.js",
   },
   "author": "matt ross <amsross@gmail.com>",
   "license": "ISC",
