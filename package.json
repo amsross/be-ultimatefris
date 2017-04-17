@@ -27,7 +27,7 @@
     "test": "npm run test:lint && npm run test:tape",
     "test:lint": "node_modules/.bin/standard",
     "test:tape": "node test.js",
-    "build": "node_modules/.bin/bankai build --optimize client.js dist/",
+    "build": "node_modules/.bin/bankai build client.js dist/",
     "start": "node_modules/.bin/bankai client.js"
   },
   "author": "matt ross <amsross@gmail.com>",
