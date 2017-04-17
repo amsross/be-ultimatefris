@@ -6,17 +6,19 @@ const game = require('../views/game')
 
 module.exports = (state, emit) => {
   return html`
-    <main onload=${() => emit('readGames')}>
-      ${header(state, emit)}
-      <section class="flex flex-row">
-        <section class="flex-auto order-0" style="flex-basis:50%;">
-          ${map(state, emit)}
+    <body>
+      <main onload=${() => emit('readGames')}>
+        ${header(state, emit)}
+        <section class="flex flex-row">
+          <section class="flex-auto order-0" style="flex-basis:50%;">
+            ${map(state, emit)}
+          </section>
+          <section class="flex-auto order-1 flex-column">
+            ${game(state, emit)}
+            ${gamesList(state, emit)}
+          </section>
         </section>
-        <section class="flex-auto order-1 flex-column">
-          ${game(state, emit)}
-          ${gamesList(state, emit)}
-        </section>
-      </section>
-    </main>
+      </main>
+    </body>
     `
 }

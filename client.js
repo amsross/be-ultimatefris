@@ -10,6 +10,4 @@ app.use(require('./models/api'))
 sheetify('./public/css/leaflet.css')
 sheetify('tachyons')
 app.route('/', Home)
-
-const tree = app.start()
-document.body.appendChild(tree)
+app.mount('body')
