@@ -4,9 +4,12 @@ const Home = require('./pages/home')
 const app = choo()
 
 if (process.env.NODE_ENV !== 'production') {
-  const logger = require('choo-log')
-  app.use(logger())
+  try {
+    const logger = require('choo-log')
+    app.use(logger())
+  } catch (e) {}
 }
+
 app.use(require('./models/api'))
 
 sheetify('./public/css/leaflet.css')
