@@ -127,7 +127,7 @@ test('models/api', assert => {
         emitter.emit.reset()
 
         assert.end()
-      }, 1000)
+      }, 2000)
     })
 
     assert.test('moveMap', assert => {
