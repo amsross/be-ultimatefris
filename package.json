@@ -26,7 +26,7 @@
   "scripts": {
     "test": "npm run test:lint && npm run test:tape",
     "test:lint": "node_modules/.bin/standard",
-    "test:tape": "node test.js",
+    "test:tape": "node_modules/.bin/tape test/**/*.js | ./node_modules/.bin/tap-spec",
     "build": "node_modules/.bin/bankai build client.js dist/",
     "start": "node_modules/.bin/bankai client.js"
   },
