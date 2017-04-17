@@ -3,12 +3,12 @@ const choo = require('choo')
 const Home = require('./pages/home')
 const app = choo()
 
-if (process.env.NODE_ENV !== 'production') {
-  try {
-    const logger = require('choo-log')
-    app.use(logger())
-  } catch (e) {}
-}
+// if (process.env.NODE_ENV !== 'production') {
+//   try {
+//     const logger = require('choo-log')
+//     app.use(logger())
+//   } catch (e) {}
+// }
 
 app.use(require('./models/api'))
 
